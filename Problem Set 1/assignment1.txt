@@ -1,9 +1,8 @@
 1) select DISTINCT reserves.bid, boats.bname, count(*) from reserves inner join boats using(bid) group by reserves.bid;
-2)
-3) 
+2) select s.sname, s.sid from sailors s where not exists (select b.bid from boats b where b.color = 'red' and not exists (select * from reserves r where r.bid = b.bid and r.sid = s.sid));
+3) select distinct s.sid, s.sname from sailors s, reserves r, boats b where r.bid = b.bid and s.sid = r.sid and b.color = "red" and s.sid not in(select s.sid from sailors s, reserves r, boats b where s.sid=r.sid and r.bid=b.bid and b.color != "red");
 4) select boats.bid, boats.bname, count(*) from boats inner join reserves using(bid) group by boats.bid order by count(*) desc limit 1;
 5) select sid, sname from sailors where not exists(select * from reserves where reserves.sid=sailors.sid and reserves.bid in (select bid from boats where color='red'));
 6) select avg(age) from sailors where rating=10;
-7) select rating, min(age) from sailors group by rating order by rating desc;
-8) select * from (select s.sid, s.sname, b.bid, count(*) as counter from sailors as s, reserves as r, boats as b where b.bid = r.bid
-and s.sid = r.sid group by b.bid, s.sid order by bid) as d group by bid; ??????
+7) select rating, sname, sid, age from (select rating, sid, sname, age, rank() over (partition by rating order by age) as r from sailors) as t where r=1;
+8) select sid, sname, bid, c from (select sid, sname, bid, c, rank() over (partition by bid order by c desc) as rnk from (select s.sid, s.sname, b.bid, count(*) as c from sailors s, reserves r, boats b where b.bid = r.bid and s.sid = r.sid group by b.bid, s.sid) as t_1 ) as t_2 where rnk = 1;
