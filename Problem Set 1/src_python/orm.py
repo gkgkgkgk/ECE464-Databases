@@ -91,11 +91,5 @@ def query7(): # DONE
 def query8():
     # Select, for each boat, the sailor who made the highest number of reservations for that boat.
     # select sid, sname, bid, c from (select sid, sname, bid, c, rank() over (partition by bid order by c desc) as rnk from (select s.sid, s.sname, b.bid, count(*) as c from sailors s, reserves r, boats b where b.bid = r.bid and s.sid = r.sid group by b.bid, s.sid) as t_1 ) as t_2 where rnk = 1;
-    q1 = db.query(reserves.sid, sailors.sname, reserves.bid, func.count(reserves.bid).label('c')).group_by(boats.bid, sailors.sid).subquery()
-    for row in q1:
-        print(row)
-    
-    
-
-
-query2()
+    q = db.query(reserves.sid, sailors.sname, reserves.bid, func.count(reserves.bid).label('c')).join(sailors, sailors.sid == reserves.sid).group_by(reserves.bid, reserves.sid).order_by(reserves.bid).all()
+    return q
